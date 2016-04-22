@@ -4,7 +4,7 @@
 ;; Author: Mola-T <Mola@molamola.xyz>
 ;; URL: https://github.com/mola-T/sign
 ;; Version: 1.0
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: internal, lisp, processes, tools
 ;;
 ;;; License:
@@ -37,6 +37,7 @@
 ;;
 ;;; code:
 
+(require 'cl-lib)
 
 (defmacro defsign (name &optional docstring)
 
