@@ -1,6 +1,6 @@
-# SIGN
+# SIGNAL
 
-Sign is an advanced hook feature.
+Signal is an advanced hook feature.
 
 It provides elegant ways to connect functions.
 
@@ -16,7 +16,7 @@ It provides elegant ways to connect functions.
 
 I will demonstrate its basic features by comparing it with the native `hook` from emacs. 
 
-For programmers having experiences in using `hook`. There should be no difficulties using `sign` as they share very similar syntax and logic.
+For programmers having experiences in using `hook`. There should be no difficulties using `signal` as they share very similar syntax and logic.
 
 <br>
 
@@ -30,7 +30,7 @@ For programmers having experiences in using `hook`. There should be no difficult
 ```
 
 ```elisp
-(defsign my-signal
+(defsignal my-signal
    "This is my signal.")
 ```
 
@@ -40,15 +40,15 @@ Signal is designed for developer, it does not expect end users to come across it
 
 <br>
 
-##### Function relating : `add-hook` vs `sign-connect`
+##### Function relating : `add-hook` vs `signal-connect`
 
 ``` elisp
 (add-hook 'my-new-hook 'print-something)
 ```
 
 ``` elisp
-(sign-connect :sign 'my-signal
-              :worker 'print-something)
+(signal-connect :signal 'my-signal
+                :worker 'print-something)
 ```
 
 If you want `print-something` being invoked when the hook runs, you use `add-hook`.
@@ -57,21 +57,21 @@ For signal, you connect a worker function to the signal. It is almost the same a
 
 <br>
 
-##### Function unrelating : `remove-hook` vs `sign-disconnect`
+##### Function unrelating : `remove-hook` vs `signal-disconnect`
 
 ``` elisp
 (remove-hook 'my-new-hook 'print-something)
 ```
 
 ```elisp
-(sign-disconnect 'my-signal 'print-something)
+(signal-disconnect 'my-signal 'print-something)
 ```
 
 Both of them have similar syntax.
 
 <br>
 
-##### Calling functions : `run-hooks` vs `emitB`
+##### Calling functions : `run-hooks` vs `signal-emitB`
 
 ``` elisp
 (defun the-function-implementing-the hook ()
@@ -84,7 +84,7 @@ Both of them have similar syntax.
 ``` elisp
 (defun the-function-implementing-the hook ()
 ;; do jobs
-    (emitB 'my-signal)
+    (signal-emitB 'my-signal)
 ;; do jobs
 )
 ```
@@ -95,10 +95,10 @@ Again, both of them are using the same implementation.
 
 ##### Brief summary
 
-`defsign` - To define a new signal.
-`sign-connect` - To connect the signal with a worker function.
-`sign-disconnect` - To disconnect a worker function from the signal.
-`emitB` - To emit a signal.
+`defsignal` - To define a new signal.
+`signal-connect` - To connect the signal with a worker function.
+`signal-disconnect` - To disconnect a worker function from the signal.
+`signal-emitB` - To emit a signal.
 
 If you feel comfortable with these four functions, you almost learn
 90% of how to use this package. Most of the new features play around with these four functions only.
@@ -112,27 +112,27 @@ ________________________________
 
 <br>
 
-### `(defsign signal-name &optional docstring)`
+### `(defsignal signal-name &optional docstring)`
 
 `defsign` - To define a new signal.
 
 <br>
 
-### `(sign-connect &key sign arg worker)`
+### `(signal-connect &key signal arg worker)`
 
-`sign-connect` is to connect the signal with a worker function.
+`signal-connect` is to connect the signal with a worker function.
 
 If you connect more than one functions to a signal, they will be called in the same order of making the connections.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'function1)
-(sign-connect :sign 'my-signal
-              :worker 'function2)
+(signal-connect :signal 'my-signal
+                :worker 'function1)
+(signal-connect :signal 'my-signal
+                :worker 'function2)
 
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> function1 invoked first
 ;; ==> function2 invoked after
 ```
@@ -140,14 +140,14 @@ If you connect more than one functions to a signal, they will be called in the s
 If you connect the worker function twice to the same signal, the worker function will be invoked twice.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'function1)
-(sign-connect :sign 'my-signal
-              :worker 'function1)
+(signal-connect :signal 'my-signal
+                :worker 'function1)
+(signal-connect :signal 'my-signal
+                :worker 'function1)
 
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> function1 invoked the first time
 ;; ==> function1 invoked the second time
 ```
@@ -158,16 +158,16 @@ You can use `:arg` to pass the argument. The arguments passed are evalusted at c
 
 ```elisp
 
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 
 
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> Current-time is 17:01:16
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> Current-time is 17:01:16
 ;; Arguments are fixed at connection-making time
 ;; No matter how many times it called, you will get the same time
@@ -177,53 +177,53 @@ If the argument passed is incorrect, it just omits it without signalling any err
 
 ```elisp
 
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg '(124567))
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg '(124567))
 
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> nothing happen
 ```
 <br>
 
-### `(sign-disconnect sign worker)`
+### `(signal-disconnect signal worker)`
 
-`sign-disconnect` - To disconnect a worker function from the signal.
+`signal-disconnect` - To disconnect a worker function from the signal.
 
 If singals had been connected to worker function mutiple times, they will be all removed.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'function1)
-(sign-connect :sign 'my-signal
-              :worker 'function1)
+(signal-connect :signal 'my-signal
+                :worker 'function1)
+(signal-connect :signal 'my-signal
+                :worker 'function1)
 
-(sign-disconnect 'my-signal 'function1)
+(signal-disconnect 'my-signal 'function1)
 
-(emitB 'my-signal)
+(signal-emitB 'my-signal)
 ;; ==> nothing happen
 ```
 <br>
 
-### `(emitB signal &key arg)`
+### `(signal-emitB signal &key arg)`
 
-`emitB` - To emit a signal.
+`signal-emitB` - To emit a signal.
 
 You can provide arguments at emit-time.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message)
+(signal-connect :signsl 'my-signal
+                :worker 'message)
 
-(emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
+(signal-emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 ;; ==> Current-time is 17:22:34
-(emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
+(signal-emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 ;; ==> Current-time is 17:22:37
 ;; In this way, arguments are evaluated at emit-time
 ```
@@ -231,13 +231,13 @@ You can provide arguments at emit-time.
 If you defined arguments at both connection time and and emit-time. The emit-time arguments will have higher priority.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg (list "connect"))
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg (list "connect"))
 
-(emitB 'my-signal :arg (list "emit"))
+(signal-emitB 'my-signal :arg (list "emit"))
 ;; ==> "emit" is printed
 ```
 
@@ -247,29 +247,29 @@ There would not be any errors signals even the worker function is undefined or a
 
 ## Final boss
 
-You may wonder if there is an `emitB`, there should be a `emita`. Sorry,
-there is no such `emita`.
+You may wonder if there is an `signal-emitB`, there should be a `signal-emitA`. Sorry,
+there is no such `signal-emitA`.
 
-However, an `emit` is indeed existed. The `b` stands for blocking. It means when the signal is emitted, it blocks the calling function, works through all functions stored in the signal first. And continue the original function afterward.
+However, an `signal-emit` is indeed existed. The `B` stands for blocking. It means when the signal is emitted, it blocks the calling function, works through all functions stored in the signal first. And continue the original function afterward.
 
 In contrast `emit` is non-blocking by letting the original function finished first.
 
 <br>
 
-### `(emit sign &key delay arg)`
+### `(signal-emit signal &key delay arg)`
 
-`emit` - To emit a *non-blocking* signal.
+`signal-emit` - To emit a *non-blocking* signal.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg (list "I am emitted."))
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg (list "I am emitted."))
 
 (progn
   (message "1 2 3 4")
-  (emitB 'my-signal)
+  (signal-emitB 'my-signal)
   (message "5 6 7 8"))
 ;; ==> 1 2 3 4
 ;; ==> I am emitted.
@@ -277,7 +277,7 @@ In contrast `emit` is non-blocking by letting the original function finished fir
 
 (progn
   (message "1 2 3 4")
-  (emit 'my-signal)
+  (signal-emit 'my-signal)
   (message "5 6 7 8"))
 ;; ==> 1 2 3 4
 ;; ==> 5 6 7 8
@@ -289,47 +289,48 @@ Can you notice that the sequence of program code changed?
 By providing the `:delay`, the worker functions will be called with delayed time. `delay` can be a floating point number which specifies a fractional number of seconds to delay.
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg (list "I am emitted."))
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg (list "I am emitted."))
 
 (progn
   (message "1 2 3 4")
-  (emit 'my-signal :delay 3)
+  (signal-emit 'my-signal :delay 3)
   (message "5 6 7 8"))
   
 ;; ==> "I am emitted." will print after 3 second.
 ```
 
-Same as `emitB` you can also provide arguments to `emit`
+Same as `signal-emitB` you can also provide arguments to `signal-emit`
 
 With everything combined, you can also write something like this:
 
 ```elisp
-(defsign my-signal)
+(defsignal my-signal)
 
 (defun my-function (count &optional connected)
 
   (when (> count 0)
         ;; do job
-        (message "sign is great")
+        (message "signal is great")
     
         (unless connected
-          (sign-connect :sign 'my-signal
-                        :worker 'my-function))
-        (emit 'my-signal :arg (list (1- count) t)))
+          (signal-connect :signal 'my-signal
+                          :worker 'my-function))
+        (signal-emit 'my-signal :arg (list (1- count) t)))
         
   (when (= count 0)
-    (sign-disconnect 'my-signal 'my-function)))
+    (signal-disconnect 'my-signal 'my-function)))
 
 (my-function 1000)
-;; ==> sign is great [1000 times]
+;; ==> signal is great [1000 times]
+
 
 (defun my-function2 (count)
   (when (> count 0)
-    (message "sign is great")
+    (message "signal is great")
     (apply 'my-function2 (list (1- count)))))
 
 (my-function2 1000)

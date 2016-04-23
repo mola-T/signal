@@ -1,8 +1,8 @@
-;;; sign.el --- Advance hook  -*- lexical-binding: t; -*- 
+;;; signal.el --- Advance hook  -*- lexical-binding: t; -*- 
 ;;
 ;; Copyright (C) 2015-2016 Mola-T
 ;; Author: Mola-T <Mola@molamola.xyz>
-;; URL: https://github.com/mola-T/sign
+;; URL: https://github.com/mola-T/signal
 ;; Version: 1.0
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: internal, lisp, processes, tools
@@ -27,37 +27,37 @@
 ;;
 ;;; Commentary:
 ;;
-;; Sign is a library offering enriched hook-like features.
-;; With sign, you are able to handle condition-based function
+;; Signal is a library offering enriched hook-like features.
+;; With signal, you are able to handle condition-based function
 ;; calls with arguments.
 ;; You can also make delayed condition-based function calls.
 ;;
 ;; You can see full introduction on
-;; https://github.com/mola-T/sign for introduction
+;; https://github.com/mola-T/signal for introduction
 ;;
 ;;; code:
 
 (require 'cl-lib)
 
-(defmacro defsign (name &optional docstring)
+(defmacro defsignal (name &optional docstring)
 
   "Defining a signal.
-Connect a signal to a worker function by `sign-connect'.
-Use `emit' to emit the signal and the worker function will be called.
+Connect a signal to a worker function by `signal-connect'.
+Use `signal-emit' to emit the signal and the worker function will be called.
 
 Example:
-\(defsign my-signal
+\(defsignal my-signal
 \"This a docmentation\"\)"
   
   (declare (doc-string 1) (indent 1))
   `(defvar ,name nil
      ,(concat "It is signal.
-`sign-connect' of `sign-disconnect' is the only approciate way
+`signal-connect' or `signal-disconnect' is the only approciate way
 to change the value of a signal. Using other setter like `setq', `let'
 or etc. ruins the signal mechanism.\n\n" docstring)))
 
 
-(defmacro undefsign (name)
+(defmacro undefsignal (name)
 
   "Undefining a signal."
 
@@ -65,10 +65,10 @@ or etc. ruins the signal mechanism.\n\n" docstring)))
 
 
 
-(cl-defun sign-connect (&key sign arg worker)
+(cl-defun signal-connect (&key signal arg worker)
 
-  "Connect a signal SIGN to its WORKER function.
-Use `emit' to emit a SIGNAL.
+  "Connect a SIGNAL to its WORKER function.
+Use `signal-emit' to emit a SIGNAL.
 
 After a signal is emitted, the WORKER function is
 called with arguments ARG.
@@ -77,78 +77,73 @@ If mutiple connections have been made, the WORKER functions
 are called in order or making connection.
 
 Example:
-(sign-connect :sign 'my-signal
-              :worker 'message
-              :arg '(\"To print a message with %d %s.\" 100 \"words\"))"
+(signal-connect :signal 'my-signal
+                :worker 'message
+                :arg '(\"To print a message with %d %s.\" 100 \"words\"))"
 
-(unless (and sign worker)
-  (error "Sign and worker must be provided."))
+(unless (and signal worker)
+  (error "Signal and worker must be provided."))
 
 (push (or (and arg (list worker arg))
           (list worker))
-      (symbol-value sign)))
+      (symbol-value signal)))
 
 
 
-(cl-defun sign-disconnect (sign worker)
+(cl-defun signal-disconnect (signal worker)
 
-  "Disconnect a signal SIGN form its WORKER function.
+  "Disconnect a SIGNAL form its WORKER function.
 If multiple connections of same worker have been made,
 all of them are disconnected
 
 Example:
-(sign-disconnect :sign 'my-signal
-                 :worker 'message"
+(signal-disconnect :signal 'my-signal
+                   :worker 'message"
 
-(while (assoc worker (symbol-value sign))
-  (set sign (delete (assoc worker (symbol-value sign)) (symbol-value sign)))))
-
-
+(while (assoc worker (symbol-value signal))
+  (set signal (delete (assoc worker (symbol-value signal)) (symbol-value signal)))))
 
 
-(cl-defun emit (sign &key delay arg)
 
-  "Emit a singal SIGN. The worker function(s) will be invoked.
+
+(cl-defun signal-emit (signal &key delay arg)
+
+  "Emit a SIGNAL. The worker function(s) will be invoked.
 
 DELAY is the second the worker functions delayed to run after
 the signal has been emitted. It can be a floating point number
 which specifies a fractional number of seconds to wait.
-By default, it is 0.01 second.
+By default, it is 0 second.
 
 ARG provides emit-time argument passing to the worker funcitons.
 
 Example:
-(emit 'my-signal)"
+(signal-emit 'my-signal)"
 
-(when (boundp sign)
+(when (boundp signal)
   (run-with-timer (or delay 0)
                   nil
                   (lambda () 
-                    (dolist (sign-1 (nreverse (copy-sequence (symbol-value sign))))
-                      (when (fboundp (car sign-1))
-                        (ignore-errors (apply (car sign-1) (or arg (cadr sign-1))))))))
+                    (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
+                      (when (fboundp (car signal-1))
+                        (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))))
   t))
 
 
 
-(cl-defun emitB (sign &key arg)
+(cl-defun signal-emitB (signal &key arg)
 
-  "Emit a blocking signal SIGN. The worker function(s) will be invoked.
-
-DELAY is the second the worker functions delayed to run after
-the signal has been emitted. It can be a floating point number
-which specifies a fractional number of seconds to wait.
-By default, it is 0.01 second.
+  "Emit a blocking SIGNAL. The worker function(s) will be invoked.
 
 ARG provides emit-time argument passing to the worker funcitons
 
 Example:
-(emitB 'my-signal)"
+(signal-emitB 'my-signal)"
 
-(when (boundp sign)
-  (dolist (sign-1 (nreverse (copy-sequence (symbol-value sign))))
-    (when (fboundp (car sign-1))
-      (ignore-errors (apply (car sign-1) (or arg (cadr sign-1))))))
+(when (boundp signal)
+  (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
+    (when (fboundp (car signal-1))
+      (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))
   t))
 
 
@@ -156,12 +151,12 @@ Example:
 
 
 (font-lock-add-keywords 'emacs-lisp-mode
-                        '(("(\\(defsign\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+                        '(("(\\(defsignal\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
                            (1 font-lock-keyword-face)
                            (2 font-lock-type-face nil t)
                            )
-                          ("(\\(undefsign\\|sign-connect\\|sign-disconnect\\|emit\\|emitB\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+                          ("(\\(undefsignal\\|signal-connect\\|signal-disconnect\\|signal-emit\\|signal-emitB\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
                            (1 font-lock-warning-face nil))))
 
-(provide 'sign)
-;;; sign.el ends here
+(provide 'signal)
+;;; signal.el ends here
