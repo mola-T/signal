@@ -1,4 +1,4 @@
-;;; signal.el --- Advance hook  -*- lexical-binding: t; -*- 
+;;; signal.el --- Advanced hook  -*- lexical-binding: t; -*- 
 ;;
 ;; Copyright (C) 2015-2016 Mola-T
 ;; Author: Mola-T <Mola@molamola.xyz>
@@ -131,14 +131,14 @@ Example:
 
 
 
-(cl-defun signal-emitB (signal &key arg)
+(cl-defun signal-emitb (signal &key arg)
 
   "Emit a blocking SIGNAL. The worker function(s) will be invoked.
 
 ARG provides emit-time argument passing to the worker funcitons
 
 Example:
-(signal-emitB 'my-signal)"
+(signal-emitb 'my-signal)"
 
 (when (boundp signal)
   (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
@@ -155,7 +155,7 @@ Example:
                            (1 font-lock-keyword-face)
                            (2 font-lock-type-face nil t)
                            )
-                          ("(\\(undefsignal\\|signal-connect\\|signal-disconnect\\|signal-emit\\|signal-emitB\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+                          ("(\\(undefsignal\\|signal-connect\\|signal-disconnect\\|signal-emit\\|signal-emitb\\)\\_>[ 	'(]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
                            (1 font-lock-warning-face nil))))
 
 (provide 'signal)

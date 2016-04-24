@@ -71,7 +71,7 @@ Both of them have similar syntax.
 
 <br>
 
-##### Calling functions : `run-hooks` vs `signal-emitB`
+##### Calling functions : `run-hooks` vs `signal-emitb`
 
 ``` elisp
 (defun the-function-implementing-the hook ()
@@ -84,7 +84,7 @@ Both of them have similar syntax.
 ``` elisp
 (defun the-function-implementing-the hook ()
 ;; do jobs
-    (signal-emitB 'my-signal)
+    (signal-emitb 'my-signal)
 ;; do jobs
 )
 ```
@@ -98,7 +98,7 @@ Again, both of them are using the same implementation.
 `defsignal` - To define a new signal.
 `signal-connect` - To connect the signal with a worker function.
 `signal-disconnect` - To disconnect a worker function from the signal.
-`signal-emitB` - To emit a signal.
+`signal-emitb` - To emit a signal.
 
 If you feel comfortable with these four functions, you almost learn
 90% of how to use this package. Most of the new features play around with these four functions only.
@@ -132,7 +132,7 @@ If you connect more than one functions to a signal, they will be called in the s
 (signal-connect :signal 'my-signal
                 :worker 'function2)
 
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> function1 invoked first
 ;; ==> function2 invoked after
 ```
@@ -147,7 +147,7 @@ If you connect the worker function twice to the same signal, the worker function
 (signal-connect :signal 'my-signal
                 :worker 'function1)
 
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> function1 invoked the first time
 ;; ==> function1 invoked the second time
 ```
@@ -165,9 +165,9 @@ You can use `:arg` to pass the argument. The arguments passed are evalusted at c
                 :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 
 
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> Current-time is 17:01:16
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> Current-time is 17:01:16
 ;; Arguments are fixed at connection-making time
 ;; No matter how many times it called, you will get the same time
@@ -183,7 +183,7 @@ If the argument passed is incorrect, it just omits it without signalling any err
                 :worker 'message
                 :arg '(124567))
 
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> nothing happen
 ```
 <br>
@@ -204,14 +204,14 @@ If singals had been connected to worker function mutiple times, they will be all
 
 (signal-disconnect 'my-signal 'function1)
 
-(signal-emitB 'my-signal)
+(signal-emitb 'my-signal)
 ;; ==> nothing happen
 ```
 <br>
 
-### `(signal-emitB signal &key arg)`
+### `(signal-emitb signal &key arg)`
 
-`signal-emitB` - To emit a signal.
+`signal-emitb` - To emit a signal.
 
 You can provide arguments at emit-time.
 
@@ -221,9 +221,9 @@ You can provide arguments at emit-time.
 (signal-connect :signsl 'my-signal
                 :worker 'message)
 
-(signal-emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
+(signal-emitb 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 ;; ==> Current-time is 17:22:34
-(signal-emitB 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
+(signal-emitb 'my-signal :arg (list "Current-time is %s" (format-time-string "%H:%M:%S")))
 ;; ==> Current-time is 17:22:37
 ;; In this way, arguments are evaluated at emit-time
 ```
@@ -237,7 +237,7 @@ If you defined arguments at both connection time and and emit-time. The emit-tim
                 :worker 'message
                 :arg (list "connect"))
 
-(signal-emitB 'my-signal :arg (list "emit"))
+(signal-emitb 'my-signal :arg (list "emit"))
 ;; ==> "emit" is printed
 ```
 
@@ -247,7 +247,7 @@ There would not be any errors signals even the worker function is undefined or a
 
 ## Final boss
 
-You may wonder if there is an `signal-emitB`, there should be a `signal-emitA`. Sorry,
+You may wonder if there is an `signal-emitb`, there should be a `signal-emitA`. Sorry,
 there is no such `signal-emitA`.
 
 However, an `signal-emit` is indeed existed. The `B` stands for blocking. It means when the signal is emitted, it blocks the calling function, works through all functions stored in the signal first. And continue the original function afterward.
@@ -269,7 +269,7 @@ In contrast `emit` is non-blocking by letting the original function finished fir
 
 (progn
   (message "1 2 3 4")
-  (signal-emitB 'my-signal)
+  (signal-emitb 'my-signal)
   (message "5 6 7 8"))
 ;; ==> 1 2 3 4
 ;; ==> I am emitted.
@@ -303,7 +303,7 @@ By providing the `:delay`, the worker functions will be called with delayed time
 ;; ==> "I am emitted." will print after 3 second.
 ```
 
-Same as `signal-emitB` you can also provide arguments to `signal-emit`
+Same as `signal-emitb` you can also provide arguments to `signal-emit`
 
 With everything combined, you can also write something like this:
 
