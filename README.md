@@ -1,3 +1,5 @@
+[![MELPA](https://melpa.org/packages/signal-badge.svg)](https://melpa.org/#/signal)
+
 # SIGNAL
 
 Signal is an advanced hook feature.
