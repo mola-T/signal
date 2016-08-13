@@ -106,12 +106,7 @@ ARG provides emit-time argument passing to the worker funcitons.
 Example:
 \(signal-emit 'my-signal)"
   (when (boundp signal)
-    (run-with-timer (or delay 0)
-                    nil
-                    (lambda ()
-                      (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
-                        (when (fboundp (car signal-1))
-                          (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))))
+    (run-with-timer (or delay 0) nil 'signal-emitb signal :arg arg)
     t))
 
 (cl-defun signal-emitb (signal &key arg)
