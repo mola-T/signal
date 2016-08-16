@@ -1,4 +1,4 @@
-;;; signal.el --- Advanced hook  -*- lexical-binding: t; -*- 
+;;; signal.el --- Advanced hook  -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2015-2016 Mola-T
 ;; Author: Mola-T <Mola@molamola.xyz>
@@ -40,7 +40,6 @@
 (require 'cl-lib)
 
 (defmacro defsignal (name &optional docstring)
-
   "Defining a signal.
 Connect a signal to a worker function by `signal-connect'.
 Use `signal-emit' to emit the signal and the worker function will be called.
@@ -48,7 +47,6 @@ Use `signal-emit' to emit the signal and the worker function will be called.
 Example:
 \(defsignal my-signal
 \"This a docmentation\"\)"
-  
   (declare (doc-string 1) (indent 1))
   `(defvar ,name nil
      ,(concat "It is signal.
@@ -56,17 +54,11 @@ Example:
 to change the value of a signal. Using other setter like `setq', `let'
 or etc. ruins the signal mechanism.\n\n" docstring)))
 
-
 (defmacro undefsignal (name)
-
   "Undefining a signal."
-
   `(unintern ,name))
 
-
-
 (cl-defun signal-connect (&key signal arg worker)
-
   "Connect a SIGNAL to its WORKER function.
 Use `signal-emit' to emit a SIGNAL.
 
@@ -77,7 +69,7 @@ If mutiple connections have been made, the WORKER functions
 are called in order or making connection.
 
 Example:
-(signal-connect :signal 'my-signal
+\(signal-connect :signal 'my-signal
                 :worker 'message
                 :arg '(\"To print a message with %d %s.\" 100 \"words\"))"
 
@@ -89,25 +81,19 @@ Example:
       (symbol-value signal)))
 
 
-
 (cl-defun signal-disconnect (signal worker)
-
   "Disconnect a SIGNAL form its WORKER function.
 If multiple connections of same worker have been made,
 all of them are disconnected
 
 Example:
-(signal-disconnect :signal 'my-signal
+\(signal-disconnect :signal 'my-signal
                    :worker 'message"
-
-(while (assoc worker (symbol-value signal))
-  (set signal (delete (assoc worker (symbol-value signal)) (symbol-value signal)))))
-
-
+  (while (assoc worker (symbol-value signal))
+    (set signal (delete (assoc worker (symbol-value signal)) (symbol-value signal)))))
 
 
 (cl-defun signal-emit (signal &key delay arg)
-
   "Emit a SIGNAL. The worker function(s) will be invoked.
 
 DELAY is the second the worker functions delayed to run after
@@ -118,36 +104,23 @@ By default, it is 0 second.
 ARG provides emit-time argument passing to the worker funcitons.
 
 Example:
-(signal-emit 'my-signal)"
-
-(when (boundp signal)
-  (run-with-timer (or delay 0)
-                  nil
-                  (lambda () 
-                    (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
-                      (when (fboundp (car signal-1))
-                        (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))))
-  t))
-
-
+\(signal-emit 'my-signal)"
+  (when (boundp signal)
+    (run-with-timer (or delay 0) nil 'signal-emitb signal :arg arg)
+    t))
 
 (cl-defun signal-emitb (signal &key arg)
-
   "Emit a blocking SIGNAL. The worker function(s) will be invoked.
 
 ARG provides emit-time argument passing to the worker funcitons
 
 Example:
-(signal-emitb 'my-signal)"
-
-(when (boundp signal)
-  (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
-    (when (fboundp (car signal-1))
-      (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))
-  t))
-
-
-
+\(signal-emitb 'my-signal)"
+  (when (boundp signal)
+    (dolist (signal-1 (nreverse (copy-sequence (symbol-value signal))))
+      (when (fboundp (car signal-1))
+        (ignore-errors (apply (car signal-1) (or arg (cadr signal-1))))))
+    t))
 
 
 (font-lock-add-keywords 'emacs-lisp-mode
